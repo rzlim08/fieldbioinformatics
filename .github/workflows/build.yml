@@ -40,6 +40,7 @@ jobs:
         with:
           activate-environment: artic
           environment-file: environment.yml
+          python-version: 3.6
           auto-activate-base: false
 
       - name: Print ARTIC environment
