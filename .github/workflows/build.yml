@@ -54,3 +54,19 @@ jobs:
           pip install .
           artic --help
           artic --version
+
+      - name: Run ARTIC pipeline unit tests
+        shell: bash -l {0}
+        run: pytest -s artic/*_unit_test.py
+
+      #- name: Run ARTIC pipeline pipeline tests
+      #  shell: bash -l {0}
+      #  run: |
+      #    ./test-runner.sh medaka
+      #    ./test-runner.sh nanopolish
+
+      - name: Run ARTIC pipeline validation tests
+        shell: bash -l {0}
+        run: |
+          pytest -s artic/minion_validator.py --workFlow nanopolish --numValidations 1
+          pytest -s artic/minion_validator.py --workFlow medaka --numValidations 2
