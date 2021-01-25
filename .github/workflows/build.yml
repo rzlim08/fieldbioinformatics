@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.toolchain }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        toolchain:
+          - linux-gcc
+          - macos-clang
+          #- windows-msvc
+        configuration:
+          - debug
+        include:
+          - toolchain: linux-gcc
+            os: ubuntu-latest
+            compiler: gcc
+          - toolchain: macos-clang
+            os: macos-latest
+            compiler: clang
+          #- toolchain: windows-msvc
+          #  os: windows-latest
+          #  compiler: msvc
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Setup ARTIC environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: artic
+          environment-file: environment.yml
+          auto-activate-base: false
+
+      - name: Print ARTIC environment
+        run: |
+          conda info
+          conda list
+
+      - name: Install ARTIC pipeline
+        run: |
+          pip install .
+          artic --help
+          artic --version
