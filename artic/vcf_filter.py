@@ -20,6 +20,7 @@ def in_frame(v):
 class NanoporeFilter:
     def __init__(self, no_frameshifts, min_depth):
         self.no_frameshifts = no_frameshifts
+        self.min_depth = min_depth
         pass
 
     def check_filter(self, v):
@@ -41,7 +42,7 @@ class NanoporeFilter:
             if float(strand_fraction_by_strand[1]) < 0.5:
                 return False
 
-        if total_reads < min_depth:
+        if total_reads < self.min_depth:
             return False
 
         return True
@@ -49,10 +50,11 @@ class NanoporeFilter:
 class MedakaFilter:
     def __init__(self, no_frameshifts, min_depth):
         self.no_frameshifts = no_frameshifts
+        self.min_depth = min_depth
 
     def check_filter(self, v):
         depth = v.INFO['DP']
-        if depth < min_depth:
+        if depth < self.min_depth:
             return False
 
         if self.no_frameshifts and not in_frame(v):
