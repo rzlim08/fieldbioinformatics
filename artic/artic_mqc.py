@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import csv
 import json
 import re
 import sys
@@ -142,17 +143,16 @@ def getVCFreportInfo(vcf_report):
     """
     # Read vcfcheck report and get important stuff out (NOTE: more to be added in next release)
     stats = dict()
-    total_vars = 0
-    passed_vars = 0
-    with open(vcf_report, "r") as fh:
-        for l in fh:
-            match = re.search(r'.*\t(\d+)\svariant\srecords\sprocessed', l)
-            if match:
-                total_vars = int(match.group(1))
-            match = re.search(r'.*\t(\d+)\svariant\srecords\spassed\schecks', l)
-            if match:
-                passed_vars = int(match.group(1))
-        stats["# overlap var. fails"] = total_vars - passed_vars
+    vcf_report_data = csv.DictReader(open(vcf_report), delimiter='\t')
+
+    # just read the first entry in the TSV and ignore the input VCF filename entry as it's not needed
+    # NOTE: artic-tools check_vcf provides a TSV with header line, meaning we can munge straight into
+    # our dict and not need any parsing here - allowing future stats to be incorporated easily with
+    # artic-tools updates
+    firstline = next(vcf_report_data)
+    for key, value in firstline.items():
+        if key != "input VCF file":
+            stats[key] = value
     return stats
 
 def run(args):
@@ -165,9 +165,11 @@ def run(args):
     amplicon_counts = getAmpliconCounts(amplicons, args.align_report)
 
     # replace amplicon names with ints and count number of dropouts
+    readCount = 0
     dropouts = 0
     amplicon_renamed_counts = dict()
     for amplicon, count in amplicon_counts.items():
+        readCount += count
         amplicon_renamed_counts[int(amplicon.split('_')[1])] = count
         if count < args.min_depth:
             dropouts += 1
@@ -183,6 +185,7 @@ def run(args):
 
     # add counts to multiqc stats template
     amplicon_stats_template["data"][args.sample] = dict()
+    amplicon_stats_template["data"][args.sample]["# mapped reads"] = readCount
     amplicon_stats_template["data"][args.sample]["# low cov. amplicons"] = dropouts
 
     # parse VCF report if provided and add to the stats template
@@ -201,7 +204,7 @@ def main():
     parser.add_argument('--scheme', required=True, type=str, help='the amplicon scheme used')
     parser.add_argument('--align-report', required=True, type=str, help='the report file from align_trim (*.alignreport.txt')
     parser.add_argument('--vcf-report', required=False, type=str, help='the report file from vcf_check (*.vcfreport.txt')
-    parser.add_argument('--min-depth', required=False, type=int, help='the minimum read depth per amplicon')
+    parser.add_argument('--min-depth', required=False, type=int, default=20, help='the minimum read depth per amplicon')
     parser.add_argument('sample', type=str, help='the sample name')
     args = parser.parse_args()
     run(args)
