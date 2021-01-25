@@ -113,6 +113,8 @@ def init_pipeline_parser():
                                 default=1, help='Primer scheme version (default: %(default)d)')
     parser_minion.add_argument('--max-haplotypes', type=int, default=1000000,
                                metavar='max_haplotypes', help='max-haplotypes value for nanopolish')
+    parser_minion.add_argument('--min-depth', type=int, default=20,
+                                metavar='min_depth', help='minimum read depth per-base for consensus masking')
     parser_minion.add_argument('--read-file', metavar='read_file',
                                help='Use alternative FASTA/FASTQ file to <sample>.fasta')
     parser_minion.add_argument('--fast5-directory', help='FAST5 Directory')

@@ -30,8 +30,7 @@ amplicon_plot_template = {
             "color": "#FF0000",
             "width": 2,
             "dashStyle": "LongDash",
-            "label": "Amplicon dropout",
-            "value": Amplicon_Dropout_Val
+            "label": "Amplicon dropout"
         }]
     },
     "data": {}
@@ -170,10 +169,11 @@ def run(args):
     amplicon_renamed_counts = dict()
     for amplicon, count in amplicon_counts.items():
         amplicon_renamed_counts[int(amplicon.split('_')[1])] = count
-        if count < Amplicon_Dropout_Val:
+        if count < args.min_depth:
             dropouts += 1
     
     # add counts to multiqc amplicon plot template
+    amplicon_plot_template["pconfig"]["yPlotLines"][0]["value"] = args.min_depth
     amplicon_plot_template["data"][args.sample] = amplicon_renamed_counts
 
     # write the amplicon plot output
@@ -201,6 +201,7 @@ def main():
     parser.add_argument('--scheme', required=True, type=str, help='the amplicon scheme used')
     parser.add_argument('--align-report', required=True, type=str, help='the report file from align_trim (*.alignreport.txt')
     parser.add_argument('--vcf-report', required=False, type=str, help='the report file from vcf_check (*.vcfreport.txt')
+    parser.add_argument('--min-depth', required=False, type=int, help='the minimum read depth per amplicon')
     parser.add_argument('sample', type=str, help='the sample name')
     args = parser.parse_args()
     run(args)
