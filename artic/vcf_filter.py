@@ -18,7 +18,7 @@ def in_frame(v):
     return False
 
 class NanoporeFilter:
-    def __init__(self, no_frameshifts):
+    def __init__(self, no_frameshifts, min_depth):
         self.no_frameshifts = no_frameshifts
         pass
 
@@ -41,18 +41,18 @@ class NanoporeFilter:
             if float(strand_fraction_by_strand[1]) < 0.5:
                 return False
 
-        if total_reads < 20:
+        if total_reads < min_depth:
             return False
 
         return True
 
 class MedakaFilter:
-    def __init__(self, no_frameshifts):
+    def __init__(self, no_frameshifts, min_depth):
         self.no_frameshifts = no_frameshifts
 
     def check_filter(self, v):
         depth = v.INFO['DP']
-        if depth < 20:
+        if depth < min_depth:
             return False
 
         if self.no_frameshifts and not in_frame(v):
@@ -67,9 +67,9 @@ def go(args):
     vcf_writer = vcf.Writer(open(args.output_pass_vcf, 'w'), vcf_reader)
     vcf_writer_filtered = vcf.Writer(open(args.output_fail_vcf, 'w'), vcf_reader)
     if args.nanopolish:
-        filter = NanoporeFilter(args.no_frameshifts)
+        filter = NanoporeFilter(args.no_frameshifts, args.min_depth)
     elif args.medaka:
-        filter = MedakaFilter(args.no_frameshifts)
+        filter = MedakaFilter(args.no_frameshifts, args.min_depth)
     else:
         print("Please specify a VCF type, i.e. --nanopolish or --medaka\n")
         raise SystemExit
@@ -87,7 +87,7 @@ def go(args):
         if args.medaka:
             if v.INFO['DP'] <= 1:
                 continue
-            if v.QUAL < 20:
+            if v.QUAL < args.min_depth:
                 continue
 
         # now apply the filter to send variants to PASS or FAIL file
@@ -114,6 +114,7 @@ def main():
     parser.add_argument('--nanopolish', action='store_true')
     parser.add_argument('--medaka', action='store_true')
     parser.add_argument('--no-frameshifts', action='store_true')
+    parser.add_argument('--min-depth', required=False, type=int, default=20,)
     parser.add_argument('inputvcf')
     parser.add_argument('output_pass_vcf')
     parser.add_argument('output_fail_vcf')

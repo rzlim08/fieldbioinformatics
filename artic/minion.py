@@ -203,9 +203,9 @@ def run(parser, args):
 
     ## filter the variants to produce PASS and FAIL lists, then index them
     if args.no_frameshifts and not args.no_indels:
-        cmds.append("artic_vcf_filter --%s --no-frameshifts %s.merged.vcf %s.pass.vcf %s.fail.vcf" % (method, args.sample, args.sample, args.sample))
+        cmds.append("artic_vcf_filter --%s --min-depth %s --no-frameshifts %s.merged.vcf %s.pass.vcf %s.fail.vcf" % (method, args.min_depth, args.sample, args.sample, args.sample))
     else:
-        cmds.append("artic_vcf_filter --%s %s.merged.vcf %s.pass.vcf %s.fail.vcf" % (method, args.sample, args.sample, args.sample))
+        cmds.append("artic_vcf_filter --%s --min-depth %s %s.merged.vcf %s.pass.vcf %s.fail.vcf" % (method, args.min_depth, args.sample, args.sample, args.sample))
     cmds.append("bgzip -f %s" % (vcf_file))
     cmds.append("tabix -p vcf %s.gz" % (vcf_file))
 
