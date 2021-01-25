@@ -143,8 +143,12 @@ def run(parser, args):
         normalise_string = '--normalise %d' % (args.normalise)
     else:
         normalise_string = ''
-    cmds.append("align_trim %s %s --start --remove-incorrect-pairs --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.trimmed.rg.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
-    cmds.append("align_trim %s %s --remove-incorrect-pairs --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.primertrimmed.rg.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+    if args.strict:
+        strict_string = '--enforce-amplicon-span'
+    else:
+        strict_string = ''
+    cmds.append("align_trim %s %s %s --start --remove-incorrect-pairs --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.trimmed.rg.sorted.bam" % (strict_string, normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+    cmds.append("align_trim %s %s %s --remove-incorrect-pairs --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.primertrimmed.rg.sorted.bam" % (strict_string, normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
     cmds.append("samtools index %s.trimmed.rg.sorted.bam" % (args.sample))
     cmds.append("samtools index %s.primertrimmed.rg.sorted.bam" % (args.sample))
 
@@ -185,11 +189,10 @@ def run(parser, args):
     # 8) check and filter the VCFs
     ## if using strict, run the vcf checker to remove vars present only once in overlap regions (this replaces the original merged vcf from the previous step)
     if args.strict:
-        cmds.append("artic-tools check_vcf --dropPrimerVars --dropOverlapFails --vcfOut %s.merged.filtered.vcf %s.merged.vcf.gz %s 2> %s.vcfreport.txt" % (args.sample, args.sample, bed, args.sample))
-        cmds.append("artic-tools check_vcf --summaryOut {}.vcfreport.txt --vcfOut {}.merged.vcf {}.merged.vcf.gz {} 2> {}.vcfcheck.log" .format(args.sample, args.sample, args.sample, bed, ars.sample))
+        cmds.append("artic-tools check_vcf --summaryOut {}.vcfreport.txt --vcfOut {}.merged.filtered.vcf {}.merged.vcf.gz {} 2> {}.vcfcheck.log" .format(args.sample, args.sample, args.sample, bed, args.sample))
         cmds.append("mv %s.merged.filtered.vcf %s.merged.vcf" % (args.sample, args.sample))
         cmds.append("bgzip -f %s.merged.vcf" % (args.sample))
-        cmds.append("tabix -p vcf %s.merged.vcf.gz" % (args.sample))
+        cmds.append("tabix -f -p vcf %s.merged.vcf.gz" % (args.sample))
     else:
         cmds.append("artic-tools check_vcf --summaryOut {}.vcfreport.txt {}.merged.vcf.gz {} 2> {}.vcfcheck.log" .format(args.sample, args.sample, bed, args.sample))
 
