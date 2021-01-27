@@ -89,7 +89,7 @@ def go(args):
         if args.medaka:
             if v.INFO['DP'] <= 1:
                 continue
-            if v.QUAL < args.min_depth:
+            if v.QUAL < 5:
                 continue
 
         # now apply the filter to send variants to PASS or FAIL file
