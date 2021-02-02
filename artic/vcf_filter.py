@@ -53,15 +53,25 @@ class MedakaFilter:
         self.min_depth = min_depth
 
     def check_filter(self, v):
-        depth = v.INFO['DP']
-        if depth < self.min_depth:
-            return False
+        total_reads = float(v.INFO['DP'])
 
         if self.no_frameshifts and not in_frame(v):
             return False
 
+        # filter on Medaka genotype quality score (GQ) 
+        ## NOTE: 
+        ## there must be a cleaner way to grab this
+        ## but can't find it in the pyVCF API...
+        medaka_score = float(v.samples[0].data[1])
+        if medaka_score < 20: 
+            return False
+
         if v.num_het:
             return False
+
+        if total_reads < self.min_depth:
+            return False
+
         return True
 
 def go(args):
@@ -84,13 +94,6 @@ def go(args):
         group_variants[indx].append(v)
     
     for v in variants:
-
-        # if using medaka, we need to do a quick pre-filter to remove rubbish that we don't want adding to the mask
-        if args.medaka:
-            if v.INFO['DP'] <= 1:
-                continue
-            if v.QUAL < 5:
-                continue
 
         # now apply the filter to send variants to PASS or FAIL file
         if filter.check_filter(v):

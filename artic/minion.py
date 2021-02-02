@@ -162,11 +162,9 @@ def run(parser, args):
                 cmds.append("medaka snp %s %s.%s.hdf %s.%s.vcf" % (ref, args.sample, p, args.sample, p))
             else:
                 cmds.append("medaka variant %s %s.%s.hdf %s.%s.vcf" % (ref, args.sample, p, args.sample, p))
-            
-            ## if not using longshot, annotate VCF with read depth info etc. so we can filter it
-            if args.no_longshot:
-                cmds.append("medaka tools annotate --pad 25 --RG %s %s.%s.vcf %s %s.trimmed.rg.sorted.bam tmp.medaka-annotate.vcf" % (p, args.sample, p, ref, args.sample))
-                cmds.append("mv tmp.medaka-annotate.vcf %s.%s.vcf" % (args.sample, p))
+            # note: medaka annotate can't overwrite files so we need to write to a tmp file and then overwrite it ourselves
+            cmds.append("medaka tools annotate --pad 25 --RG %s %s.%s.vcf %s %s.trimmed.rg.sorted.bam tmp.medaka-annotate.vcf" % (p, args.sample, p, ref, args.sample))
+            cmds.append("mv tmp.medaka-annotate.vcf %s.%s.vcf" % (args.sample, p))
 
     else:
         if not args.skip_nanopolish:
@@ -195,12 +193,6 @@ def run(parser, args):
         cmds.append("tabix -f -p vcf %s.merged.vcf.gz" % (args.sample))
     else:
         cmds.append("artic-tools check_vcf --summaryOut {}.vcfreport.txt {}.merged.vcf.gz {} 2> {}.vcfcheck.log" .format(args.sample, args.sample, bed, args.sample))
-
-    ## if doing the medaka workflow and longshot required, do it on the merged VCF
-    if args.medaka and not args.no_longshot:
-        cmds.append("longshot -P 0 -F -A --no_haps --bam %s.primertrimmed.rg.sorted.bam --ref %s --out %s.merged.vcf --potential_variants %s.merged.vcf.gz" % (args.sample, ref, args.sample, args.sample))
-        cmds.append("bgzip -f %s.merged.vcf" % (args.sample))
-        cmds.append("tabix -f -p vcf %s.merged.vcf.gz" % (args.sample))
 
     ## set up some name holder vars for ease
     if args.medaka:

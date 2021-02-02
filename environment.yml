@@ -12,7 +12,7 @@ dependencies:
   - clint=0.5.1
   - htslib=1.10.2
   - longshot=0.4.1
-  - medaka=1.0.3
+  #- medaka=1.0.3
   - minimap2=2.17
   - multiqc
   - muscle=3.8
@@ -26,3 +26,6 @@ dependencies:
   - pyvcf=0.6.8
   - samtools=1.10
   - tqdm
+  - whatshap
+  - pip:
+      - medaka==1.2.2rc1

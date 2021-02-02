@@ -245,7 +245,6 @@ artic minion <scheme> <sample>
 | --fast5-directory    | N        | NA             | FAST5 Directory                                                                                |
 | --sequencing-summary | N        | NA             | Path to Guppy sequencing summary                                                               |
 | --skip-nanopolish    | N        | False          | Skip nanopolish                                                                                |
-| --no-longshot        | N        | False          | Use medaka variant instead of longshot (experimental feature from v1.2.0)                      |
 | --min-depth          | N        | 20             | Minimum read depth per-base for consensus masking                                              |
 | --strict             | N        | False          | Run withn full-length amplicon alignments & strict filtering of variants against primer scheme |
 | --dry-run            | N        | False          | Perform a dry run of the minion pipeline, outputing commands to a log but not executing them   |
