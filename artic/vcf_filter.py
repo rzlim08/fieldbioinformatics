@@ -60,9 +60,9 @@ class MedakaFilter:
 
         # filter on Medaka genotype quality score (GQ) 
         ## NOTE: 
-        ## there must be a cleaner way to grab this
-        ## but can't find it in the pyVCF API...
-        medaka_score = float(v.samples[0].data[1])
+        ## this isn't very robust but will do for our
+        ## use case.
+        medaka_score = float(v.samples[0].data.GQ)
         if medaka_score < 20: 
             return False
 
