@@ -27,5 +27,6 @@ dependencies:
   - samtools=1.10
   - tqdm
   - whatshap
+  - parasail-python
   - pip:
       - medaka==1.2.2rc1
