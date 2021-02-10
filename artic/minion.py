@@ -203,9 +203,9 @@ def run(parser, args):
 
     ## filter the variants to produce PASS and FAIL lists, then index them
     if args.no_frameshifts and not args.no_indels:
-        cmds.append("artic_vcf_filter --%s --min-depth %s --no-frameshifts %s.merged.vcf.gz %s.pass.vcf %s.fail.vcf" % (method, args.min_depth, args.sample, args.sample, args.sample))
+        cmds.append("artic_vcf_filter --%s --min-depth %s --min-qual %s --nanopolish-qual-cov-ratio %s --no-frameshifts %s.merged.vcf.gz %s.pass.vcf %s.fail.vcf" % (method, args.min_depth, args.min_qual, args.nanopolish_qual_cov_ratio, args.sample, args.sample, args.sample))
     else:
-        cmds.append("artic_vcf_filter --%s --min-depth %s %s.merged.vcf.gz %s.pass.vcf %s.fail.vcf" % (method, args.min_depth, args.sample, args.sample, args.sample))
+        cmds.append("artic_vcf_filter --%s --min-depth %s --min-qual %s --nanopolish-qual-cov-ratio %s %s.merged.vcf.gz %s.pass.vcf %s.fail.vcf" % (method, args.min_depth, args.min_qual, args.nanopolish_qual_cov_ratio, args.sample, args.sample, args.sample))
 
     # 9) get the depth of coverage for each readgroup, create a coverage mask and plots, and add failed variants to the coverage mask (artic_mask must be run before bcftools consensus)
     cmds.append("artic_make_depth_mask --depth %s %s %s.primertrimmed.rg.sorted.bam %s.coverage_mask.txt" % (args.min_depth, ref, args.sample, args.sample))

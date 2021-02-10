@@ -114,6 +114,9 @@ def init_pipeline_parser():
                                metavar='max_haplotypes', help='max-haplotypes value for nanopolish')
     parser_minion.add_argument('--min-depth', type=int, default=20,
                                 metavar='min_depth', help='minimum read depth per-base for consensus masking')
+    parser_minion.add_argument('--min-qual', type=int, default=20,
+                                metavar='min_qual', help='minimum variant quality for consensus masking')
+    parser_minion.add_argument('--nanopolish-qual-cov-ratio', type=float, default=3.0, metavar='nanopolish_qual_cov_ratio', help='the quality/coverage cutoff for filtering nanopolish variants')
     parser_minion.add_argument('--read-file', metavar='read_file',
                                help='Use alternative FASTA/FASTQ file to <sample>.fasta')
     parser_minion.add_argument('--fast5-directory', help='FAST5 Directory')
@@ -123,7 +126,7 @@ def init_pipeline_parser():
     parser_minion.add_argument('--no-indels', action='store_true', help='Do not report InDels (uses SNP-only mode of nanopolish/medaka)')
     parser_minion.add_argument('--no-frameshifts', action='store_true', help='Remove variants which induce frameshifts (ignored when --no-indels set)')
     parser_minion.add_argument('--dry-run', action='store_true')
-    parser_minion.add_argument('--strict', action='store_true', help='Run withn full-length amplicon alignments & strict filtering of variants against primer scheme')
+    parser_minion.add_argument('--strict', action='store_true', help='Run with full-length amplicon alignments & strict filtering of variants against primer scheme')
     parser_minion.set_defaults(func=run_subtool)
 
     # gather
