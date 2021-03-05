@@ -163,8 +163,8 @@ def run(parser, args):
             else:
                 cmds.append("medaka variant %s %s.%s.hdf %s.%s.vcf" % (ref, args.sample, p, args.sample, p))
             # note: medaka annotate can't overwrite files so we need to write to a tmp file and then overwrite it ourselves
-            cmds.append("medaka tools annotate --pad 25 --RG %s %s.%s.vcf %s %s.trimmed.rg.sorted.bam tmp.medaka-annotate.vcf" % (p, args.sample, p, ref, args.sample))
-            cmds.append("mv tmp.medaka-annotate.vcf %s.%s.vcf" % (args.sample, p))
+            cmds.append("medaka tools annotate --pad 25 --RG %s %s.%s.vcf %s %s.trimmed.rg.sorted.bam %s.medaka-annotate.vcf" % (p, args.sample, p, ref, args.sample, args.sample))
+            cmds.append("mv %s.medaka-annotate.vcf %s.%s.vcf" % (args.sample, args.sample, p))
 
     else:
         if not args.skip_nanopolish:
